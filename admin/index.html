@@ -10238,6 +10238,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     locationsByIata: new Map(),
                     latencyRun: null,
                     speedRun: null,
+                    networkChecking: false,
                     editorResizeObserver: null,
                     results: [],
                     selectedIds: new Set(),
@@ -10305,18 +10306,30 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     [els.limitInput, els.timeoutInput, els.threadsInput, els.portInput].forEach((input) => {
                         input.addEventListener("change", () => clampNumberInput(input));
                     });
-                    els.latencyBtn.addEventListener("click", () => {
+                    els.latencyBtn.addEventListener("click", async () => {
                         if (state.latencyRun) {
                             stopLatencyRun();
                             return;
                         }
+                        if (state.networkChecking) return;
+                        if (!await ensureCnNetworkBeforeAction({
+                            button: els.latencyBtn,
+                            statusEl: els.latencyStatus,
+                            idleHtml: `${svgPulseIcon()}优选延迟`
+                        })) return;
                         startLatencyRun();
                     });
-                    els.speedAllBtn.addEventListener("click", () => {
+                    els.speedAllBtn.addEventListener("click", async () => {
                         if (state.speedRun) {
                             stopSpeedRun();
                             return;
                         }
+                        if (state.networkChecking) return;
+                        if (!await ensureCnNetworkBeforeAction({
+                            button: els.speedAllBtn,
+                            statusEl: els.speedStatus,
+                            idleHtml: `${svgBoltIcon()}全部测速`
+                        })) return;
                         startAllSpeedTests();
                     });
                     els.resultBody.addEventListener("click", (event) => {
@@ -10368,79 +10381,111 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 }
 
                 async function detectNetwork() {
-                    if (state.latencyRun) stopLatencyRun();
-                    if (state.speedRun) stopSpeedRun();
+                    return refreshCnNetwork({ resetResults: true, stopRuns: true });
+                }
+
+                async function ensureCnNetworkBeforeAction({ button, statusEl, idleHtml }) {
+                    if (state.networkChecking) return false;
+                    if (button) button.innerHTML = `${svgPulseIcon()}网络验证`;
+                    if (statusEl) statusEl.textContent = "正在检测CN网络";
+                    const allowed = await refreshCnNetwork({ resetResults: false, stopRuns: false });
+                    if (!allowed) {
+                        if (button && idleHtml) button.innerHTML = idleHtml;
+                        if (statusEl) statusEl.textContent = "检测未通过，请关闭代理后重试";
+                        return false;
+                    }
+                    if (statusEl) statusEl.textContent = "CN网络检测通过";
+                    return true;
+                }
+
+                async function refreshCnNetwork({ resetResults = false, stopRuns = false } = {}) {
+                    if (state.networkChecking) return availableFamilies().length > 0;
+                    state.networkChecking = true;
+
+                    if (stopRuns) {
+                        if (state.latencyRun) stopLatencyRun();
+                        if (state.speedRun) stopSpeedRun();
+                    }
 
                     state.ipv4 = null;
                     state.ipv6 = null;
                     state.network = { ipv4: null, ipv6: null };
                     state.locations = [];
                     state.locationsByIata = new Map();
-                    state.results = [];
-                    state.selectedIds.clear();
-                    state.nextResultId = 1;
-                    renderResults();
-                    setProgress(0, 0);
+                    if (resetResults) {
+                        state.results = [];
+                        state.selectedIds.clear();
+                        state.nextResultId = 1;
+                        renderResults();
+                        setProgress(0, 0);
+                    }
 
                     renderNetworkCard("ipv4", { status: "loading" });
                     renderNetworkCard("ipv6", { status: "loading" });
                     updateLibraryOptions();
                     updateActionAvailability();
 
-                    const checks = await Promise.allSettled([
-                        detectStack("ipv4"),
-                        detectStack("ipv6")
-                    ]);
+                    try {
+                        const checks = await Promise.allSettled([
+                            detectStack("ipv4"),
+                            detectStack("ipv6")
+                        ]);
 
-                    checks.forEach((result, index) => {
-                        const family = index === 0 ? "ipv4" : "ipv6";
-                        if (result.status === "fulfilled") {
-                            state.network[family] = result.value;
-                            if (result.value.allowed) {
-                                if (result.value.ipType === "ipv4") state.ipv4 = result.value.ip;
-                                if (result.value.ipType === "ipv6") state.ipv6 = result.value.ip;
+                        checks.forEach((result, index) => {
+                            const family = index === 0 ? "ipv4" : "ipv6";
+                            if (result.status === "fulfilled") {
+                                state.network[family] = result.value;
+                                if (result.value.allowed) {
+                                    if (result.value.ipType === "ipv4") state.ipv4 = result.value.ip;
+                                    if (result.value.ipType === "ipv6") state.ipv6 = result.value.ip;
+                                }
+                            } else {
+                                state.network[family] = {
+                                    status: "failed",
+                                    error: result.reason && result.reason.message ? result.reason.message : "检测失败"
+                                };
                             }
-                        } else {
-                            state.network[family] = {
-                                status: "failed",
-                                error: result.reason && result.reason.message ? result.reason.message : "检测失败"
-                            };
-                        }
-                    });
+                        });
 
-                    renderNetworkCard("ipv4", state.network.ipv4);
-                    renderNetworkCard("ipv6", state.network.ipv6);
-                    updateLibraryOptions();
-                    await loadLocations();
-                    updateServiceStatus();
-                    updateActionAvailability();
-                    if (availableFamilies().length === 0) showNetworkWarning();
+                        renderNetworkCard("ipv4", state.network.ipv4);
+                        renderNetworkCard("ipv6", state.network.ipv6);
+                        updateLibraryOptions();
+                        await loadLocations();
+                        updateServiceStatus();
+
+                        const allowed = availableFamilies().length > 0;
+                        if (!allowed) showNetworkWarning();
+                        return allowed;
+                    } finally {
+                        state.networkChecking = false;
+                        updateActionAvailability();
+                    }
                 }
 
-    function showNetworkWarning() {
-      els.networkWarningOverlay.classList.add("is-visible");
-      els.networkWarningConfirmBtn.focus();
-    }
+                function showNetworkWarning() {
+                    els.networkWarningOverlay.classList.add("is-visible");
+                    els.networkWarningConfirmBtn.focus();
+                }
 
-    function confirmNetworkWarning() {
-      if (window.parent && window.parent !== window) {
-        try {
-          window.parent.location.reload();
-          return;
-        } catch (error) {
-          // Fall back to postMessage below when direct parent access is unavailable.
-        }
+                function confirmNetworkWarning() {
+                    if (window.parent && window.parent !== window) {
+                        try {
+                            window.parent.location.reload();
+                            return;
+                        } catch (error) {
+                            // Fall back to postMessage below when direct parent access is unavailable.
+                        }
 
-        try {
-          window.parent.postMessage({ type: "bestcf-force-reload" }, "*");
-          return;
-        } catch (error) {
-          // Ignore and reload the current document as a last resort.
-        }
-      }
+                        try {
+                            window.parent.postMessage({ type: "bestcf-force-reload" }, "*");
+                            return;
+                        } catch (error) {
+                            // Ignore and reload the current document as a last resort.
+                        }
+                    }
 
-      window.location.reload();
-    }
+                    window.location.reload();
+                }
 
                 async function detectStack(family) {
                     const base = DETECT_ENDPOINTS[family];
@@ -10576,8 +10621,11 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     const hasService = availableFamilies().length > 0;
                     const latencyActive = Boolean(state.latencyRun);
                     const speedActive = Boolean(state.speedRun);
-                    els.latencyBtn.disabled = speedActive || (!hasService && !latencyActive);
-                    els.speedAllBtn.disabled = latencyActive || (state.results.length === 0 && !speedActive);
+                    els.latencyBtn.disabled = state.networkChecking || speedActive || (!hasService && !latencyActive);
+                    els.speedAllBtn.disabled = state.networkChecking ||
+                        latencyActive ||
+                        (!hasService && !speedActive) ||
+                        (state.results.length === 0 && !speedActive);
                 }
 
                 async function importLibrary() {
@@ -10625,6 +10673,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                         candidates = prepareCandidates(els.ipInput.value, settings.limit, settings.port);
                     } catch (error) {
                         els.latencyStatus.textContent = friendlyError(error);
+                        els.latencyBtn.innerHTML = `${svgPulseIcon()}优选延迟`;
                         return;
                     }
 
