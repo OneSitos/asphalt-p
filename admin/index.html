@@ -9196,6 +9196,93 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     margin-bottom: 16px;
                 }
 
+                .control-row + .advanced-settings {
+                    margin-top: 16px;
+                }
+
+                .advanced-settings {
+                    border: 1px solid var(--line);
+                    border-radius: var(--radius);
+                    background: #f8fafc;
+                }
+
+                .advanced-settings-summary {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    min-height: 42px;
+                    padding: 10px 12px;
+                    cursor: pointer;
+                    list-style: none;
+                    user-select: none;
+                }
+
+                .advanced-settings-summary::-webkit-details-marker {
+                    display: none;
+                }
+
+                .advanced-settings-summary:hover {
+                    background: #eef4ff;
+                }
+
+                .advanced-settings-summary:focus-visible {
+                    outline: 2px solid rgba(37, 99, 235, 0.24);
+                    outline-offset: -2px;
+                }
+
+                .advanced-settings-copy {
+                    display: flex;
+                    align-items: baseline;
+                    flex: 1 1 auto;
+                    gap: 10px;
+                    min-width: 0;
+                }
+
+                .advanced-settings-title {
+                    color: #344054;
+                    font-size: 13px;
+                    font-weight: 760;
+                    white-space: nowrap;
+                }
+
+                .advanced-settings-meta {
+                    min-width: 0;
+                    overflow: hidden;
+                    color: var(--muted);
+                    font-size: 12px;
+                    font-weight: 400;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .advanced-settings-chevron {
+                    width: 18px;
+                    height: 18px;
+                    color: var(--muted);
+                    fill: none;
+                    flex: 0 0 auto;
+                    stroke: currentColor;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                    stroke-width: 2;
+                    transition: transform 0.15s ease;
+                }
+
+                .advanced-settings[open] .advanced-settings-summary {
+                    border-bottom: 1px solid var(--line);
+                }
+
+                .advanced-settings[open] .advanced-settings-chevron {
+                    transform: rotate(180deg);
+                }
+
+                .advanced-settings-body {
+                    padding: 12px;
+                    background: #ffffff;
+                    border-radius: 0 0 var(--radius) var(--radius);
+                }
+
                 .field {
                     display: grid;
                     gap: 7px;
@@ -10030,6 +10117,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
 
                 html.dark-mode .network-item,
                 html.dark-mode .editor-bar,
+                html.dark-mode .advanced-settings,
                 html.dark-mode th,
                 html.dark-mode .line-gutter,
                 html.dark-mode .shade-line:nth-child(even),
@@ -10115,7 +10203,16 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65), 0 0 0 8px rgba(251, 191, 36, 0.16);
                 }
 
+                html.dark-mode .advanced-settings-body {
+                    background: var(--panel);
+                }
+
+                html.dark-mode .advanced-settings-summary:hover {
+                    background: rgba(96, 165, 250, 0.12);
+                }
+
                 html.dark-mode .field label,
+                html.dark-mode .advanced-settings-title,
                 html.dark-mode th,
                 html.dark-mode .icon-btn,
                 html.dark-mode .btn.secondary {
@@ -10211,6 +10308,12 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                         grid-template-columns: 1fr;
                     }
 
+                    .advanced-settings-copy {
+                        align-items: flex-start;
+                        flex-direction: column;
+                        gap: 3px;
+                    }
+
                     .network-grid {
                         grid-template-columns: 1fr;
                     }
@@ -10298,34 +10401,6 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                                 <h2 class="panel-title" id="inputTitle">待选列表</h2>
                             </div>
                             <div class="panel-body">
-                                <div class="settings-block">
-                                    <div class="form-grid compact">
-                                        <div class="field">
-                                            <label for="limitInput">待测IP数</label>
-                                            <input class="input" id="limitInput" type="number" min="1" max="4096"
-                                                step="1" value="512">
-                                        </div>
-                                        <div class="field">
-                                            <label for="timeoutInput">超时时间 ms</label>
-                                            <input class="input" id="timeoutInput" type="number" min="100" max="10000"
-                                                step="50" value="500">
-                                        </div>
-                                        <div class="field">
-                                            <label for="threadsInput">并发线程</label>
-                                            <input class="input" id="threadsInput" type="number" min="1" max="32"
-                                                step="1" value="16">
-                                        </div>
-                                        <div class="field">
-                                            <div class="label-row">
-                                                <label for="portInput">优选端口</label>
-                                                <span class="help-tip" tabindex="0" role="img" aria-label="端口说明"
-                                                    data-tip="端口为 0 时，随机设置 443、2053、2083、2087、2096、8443 端口。">!</span>
-                                            </div>
-                                            <input class="input" id="portInput" type="number" min="0" max="65535"
-                                                step="1" value="0">
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="control-row">
                                     <div class="field">
                                         <label for="librarySelect">IP库</label>
@@ -10346,6 +10421,46 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                                         优选延迟
                                     </button>
                                 </div>
+
+                                <details class="settings-block advanced-settings">
+                                    <summary class="advanced-settings-summary">
+                                        <span class="advanced-settings-copy">
+                                            <span class="advanced-settings-title">高级设置</span>
+                                            <span class="advanced-settings-meta">待测数量、超时、并发、端口</span>
+                                        </span>
+                                        <svg class="advanced-settings-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M6 9l6 6 6-6"></path>
+                                        </svg>
+                                    </summary>
+                                    <div class="advanced-settings-body">
+                                        <div class="form-grid compact">
+                                            <div class="field">
+                                                <label for="limitInput">待测IP数</label>
+                                                <input class="input" id="limitInput" type="number" min="1" max="4096"
+                                                    step="1" value="512">
+                                            </div>
+                                            <div class="field">
+                                                <label for="timeoutInput">超时时间 ms</label>
+                                                <input class="input" id="timeoutInput" type="number" min="100"
+                                                    max="10000" step="50" value="500">
+                                            </div>
+                                            <div class="field">
+                                                <label for="threadsInput">并发线程</label>
+                                                <input class="input" id="threadsInput" type="number" min="1" max="32"
+                                                    step="1" value="16">
+                                            </div>
+                                            <div class="field">
+                                                <div class="label-row">
+                                                    <label for="portInput">优选端口</label>
+                                                    <span class="help-tip" tabindex="0" role="img" aria-label="端口说明"
+                                                        data-tip="端口为 0 时，随机设置 443、2053、2083、2087、2096、8443 端口。">!</span>
+                                                </div>
+                                                <input class="input" id="portInput" type="number" min="0" max="65535"
+                                                    step="1" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </details>
 
                                 <div class="editor">
                                     <div class="editor-bar">
