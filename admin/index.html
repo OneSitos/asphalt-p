@@ -9812,24 +9812,29 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     animation: networkWarningPop 0.18s ease-out;
                 }
 
+                .network-warning-modal.is-request-failed {
+                    background: #b7791f;
+                    box-shadow: 0 28px 80px rgba(92, 54, 9, 0.62), 0 0 0 8px rgba(183, 121, 31, 0.22);
+                }
+
                 .network-warning-body {
                     display: grid;
                     gap: 12px;
                     padding: 24px 24px 18px;
-                    line-height: 1.7;
-                    font-size: 18px;
-                    font-weight: 820;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+                    line-height: 1.55;
+                    font-size: 15px;
+                    font-weight: 650;
                 }
 
                 .network-warning-heading {
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    font-size: 26px;
+                    font-size: 25px;
                     line-height: 1.25;
                     font-weight: 900;
                     letter-spacing: 0;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
                 }
 
                 .network-warning-heading::before,
@@ -9838,6 +9843,88 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     flex: 1;
                     height: 2px;
                     background: rgba(255, 255, 255, 0.72);
+                }
+
+                .network-warning-title {
+                    font-size: 18px;
+                    font-weight: 850;
+                }
+
+                .network-warning-message {
+                    color: rgba(255, 255, 255, 0.92);
+                    font-weight: 680;
+                }
+
+                .network-warning-summary {
+                    display: grid;
+                    gap: 8px;
+                    margin-top: 2px;
+                }
+
+                .network-warning-row {
+                    display: grid;
+                    grid-template-columns: 60px minmax(0, 1fr) auto;
+                    align-items: center;
+                    gap: 10px;
+                    min-height: 38px;
+                    padding: 8px 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                    border-radius: var(--radius);
+                    background: rgba(255, 255, 255, 0.12);
+                }
+
+                .network-warning-family {
+                    font-family: var(--mono);
+                    font-weight: 850;
+                }
+
+                .network-warning-ip {
+                    min-width: 0;
+                    overflow-wrap: anywhere;
+                    font-family: var(--mono);
+                    font-weight: 760;
+                }
+
+                .network-warning-country {
+                    padding: 2px 7px;
+                    border-radius: 999px;
+                    background: rgba(255, 255, 255, 0.18);
+                    font-family: var(--mono);
+                    font-size: 12px;
+                    font-weight: 850;
+                    white-space: nowrap;
+                }
+
+                .network-warning-details {
+                    margin-top: 2px;
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                    border-radius: var(--radius);
+                    background: rgba(127, 29, 29, 0.24);
+                    overflow: hidden;
+                }
+
+                .network-warning-details[hidden] {
+                    display: none;
+                }
+
+                .network-warning-details summary {
+                    padding: 9px 11px;
+                    cursor: pointer;
+                    font-weight: 800;
+                }
+
+                .network-warning-json {
+                    max-height: 260px;
+                    margin: 0;
+                    padding: 11px;
+                    overflow: auto;
+                    border-top: 1px solid rgba(255, 255, 255, 0.22);
+                    background: rgba(15, 23, 42, 0.54);
+                    color: #ffffff;
+                    font-family: var(--mono);
+                    font-size: 12px;
+                    line-height: 1.55;
+                    white-space: pre-wrap;
                 }
 
                 .network-warning-actions {
@@ -9856,10 +9943,20 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     font-weight: 900;
                 }
 
+                .network-warning-modal.is-request-failed .network-warning-actions .btn {
+                    color: #8a4d0f;
+                }
+
                 .network-warning-actions .btn:hover:not(:disabled) {
                     background: #fff1f2;
                     color: #7f1d1d;
                     box-shadow: 0 16px 36px rgba(127, 29, 29, 0.36);
+                }
+
+                .network-warning-modal.is-request-failed .network-warning-actions .btn:hover:not(:disabled) {
+                    background: #fff7e6;
+                    color: #6f3d0a;
+                    box-shadow: 0 16px 36px rgba(92, 54, 9, 0.32);
                 }
 
                 @keyframes networkWarningPop {
@@ -10010,6 +10107,11 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     background: #b91c1c;
                     color: #ffffff;
                     box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65), 0 0 0 8px rgba(248, 113, 113, 0.18);
+                }
+
+                html.dark-mode .network-warning-modal.is-request-failed {
+                    background: #92400e;
+                    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65), 0 0 0 8px rgba(251, 191, 36, 0.16);
                 }
 
                 html.dark-mode .field label,
@@ -10344,11 +10446,16 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
 
             <div class="network-warning-overlay" id="networkWarningOverlay" role="dialog" aria-modal="true"
                 aria-labelledby="networkWarningTitle">
-                <div class="network-warning-modal">
+                <div class="network-warning-modal" id="networkWarningModal">
                     <div class="network-warning-body">
-                        <div class="network-warning-heading">红牌警告</div>
-                        <div id="networkWarningTitle">⚠️ 检测到您当前很可能处于代理/VPN环境中！请确保处于CN网络直连环境下再进行在线优选，否则优选测试结果将因为代理变得毫无意义！
-                        </div>
+                        <div class="network-warning-heading" id="networkWarningHeading">红牌警告</div>
+                        <div class="network-warning-title" id="networkWarningTitle">检测到当前网络出口不是 CN 直连</div>
+                        <div class="network-warning-message" id="networkWarningMessage"></div>
+                        <div class="network-warning-summary" id="networkWarningSummary"></div>
+                        <details class="network-warning-details" id="networkWarningDetails" hidden>
+                            <summary>查看详细响应内容</summary>
+                            <pre class="network-warning-json" id="networkWarningJson"></pre>
+                        </details>
                     </div>
                     <div class="network-warning-actions">
                         <button class="btn" id="networkWarningConfirmBtn" type="button">确定</button>
@@ -10463,6 +10570,13 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     closeBestCFBtn: $("#closeBestCFBtn"),
                     selectionStatus: $("#selectionStatus"),
                     networkWarningOverlay: $("#networkWarningOverlay"),
+                    networkWarningModal: $("#networkWarningModal"),
+                    networkWarningHeading: $("#networkWarningHeading"),
+                    networkWarningTitle: $("#networkWarningTitle"),
+                    networkWarningMessage: $("#networkWarningMessage"),
+                    networkWarningSummary: $("#networkWarningSummary"),
+                    networkWarningDetails: $("#networkWarningDetails"),
+                    networkWarningJson: $("#networkWarningJson"),
                     networkWarningConfirmBtn: $("#networkWarningConfirmBtn")
                 };
 
@@ -10664,8 +10778,85 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 }
 
                 function showNetworkWarning() {
+                    renderNetworkWarning(buildNetworkWarningContext());
                     els.networkWarningOverlay.classList.add("is-visible");
                     els.networkWarningConfirmBtn.focus();
+                }
+
+                function buildNetworkWarningContext() {
+                    const entries = ["ipv4", "ipv6"].map((family) => ({
+                        family,
+                        info: state.network[family]
+                    }));
+                    const completed = entries.filter(({ info }) => info && info.status === "done");
+                    const nonCn = completed.filter(({ info }) => !info.allowed);
+
+                    if (nonCn.length) {
+                        return {
+                            kind: "non-cn",
+                            heading: "红牌警告",
+                            title: "检测到当前网络出口不是 CN 直连",
+                            message: "当前在线优选检测已成功完成，但返回的出口国家代码不是 CN。请确认浏览器当前访问链路是否经过代理、VPN 或境外网络后再进行优选，否则延迟与测速结果不能代表 CN 直连环境。",
+                            rows: nonCn,
+                            details: completed
+                        };
+                    }
+
+                    return {
+                        kind: "request-failed",
+                        heading: "检测失败",
+                        title: "优选域名请求失败",
+                        message: "优选域名请求失败，自行检查网络环境，确保优选域名可访问。",
+                        rows: entries,
+                        details: completed
+                    };
+                }
+
+                function renderNetworkWarning(context) {
+                    els.networkWarningModal.classList.toggle("is-request-failed", context.kind === "request-failed");
+                    els.networkWarningHeading.textContent = context.heading;
+                    els.networkWarningTitle.textContent = context.title;
+                    els.networkWarningMessage.textContent = context.message;
+                    els.networkWarningSummary.innerHTML = context.rows.map(({ family, info }) => {
+                        if (context.kind === "non-cn") return renderNetworkWarningNonCnRow(family, info);
+                        return renderNetworkWarningFailedRow(family, info);
+                    }).join("");
+
+                    const detailPayload = context.details
+                        .filter(({ info }) => info && info.raw)
+                        .map(({ family, info }) => ({
+                            family,
+                            endpoint: info.endpoint || "",
+                            response: info.raw
+                        }));
+                    if (detailPayload.length) {
+                        els.networkWarningJson.textContent = JSON.stringify(detailPayload, null, 2);
+                        els.networkWarningDetails.hidden = false;
+                        els.networkWarningDetails.open = false;
+                    } else {
+                        els.networkWarningJson.textContent = "";
+                        els.networkWarningDetails.hidden = true;
+                        els.networkWarningDetails.open = false;
+                    }
+                }
+
+                function renderNetworkWarningNonCnRow(family, info) {
+                    const ip = info && info.ip ? info.ip : "未获取";
+                    const country = info && info.country ? String(info.country).toUpperCase() : "未知";
+                    return `<div class="network-warning-row">
+                        <span class="network-warning-family">${escapeHtml(family.toUpperCase())}</span>
+                        <span class="network-warning-ip">${escapeHtml(ip)}</span>
+                        <span class="network-warning-country">国家代码 ${escapeHtml(country)}</span>
+                    </div>`;
+                }
+
+                function renderNetworkWarningFailedRow(family, info) {
+                    const error = info && info.error ? info.error : "请求失败";
+                    return `<div class="network-warning-row">
+                        <span class="network-warning-family">${escapeHtml(family.toUpperCase())}</span>
+                        <span class="network-warning-ip">${escapeHtml(error)}</span>
+                        <span class="network-warning-country">失败</span>
+                    </div>`;
                 }
 
                 function confirmNetworkWarning() {
@@ -10701,7 +10892,8 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                         cnIspCode: data.cnIspCode || "",
                         preferredType: preferredTypeFromCnIspCode(data.cnIspCode),
                         colo: data.colo || "",
-                        asn: data.asn || ""
+                        asn: data.asn || "",
+                        raw: data
                     };
                 }
 
